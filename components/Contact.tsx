@@ -26,12 +26,12 @@ const Contact: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       const { error } = await supabase
-        .from('leads')
+        .from('DataLP')
         .insert([
           { 
             email: formState.email, 
-            website: formState.website, 
-            created_at: new Date().toISOString() 
+            website: formState.website,
+            // Supabase handles created_at and id automatically
           },
         ]);
 
@@ -43,7 +43,7 @@ const Contact: React.FC = () => {
       console.error('Error adding lead:', error);
       setStatus('error');
       if (error.code === '42P01') {
-        setErrorMessage("Error de configuración: La tabla 'leads' no existe.");
+        setErrorMessage("Error de configuración: La tabla 'DataLP' no existe.");
       } else if (error.code === '42501') {
          setErrorMessage("Error de permisos: RLS bloqueó la inserción.");
       } else {

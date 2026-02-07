@@ -52,10 +52,12 @@ const Hero: React.FC = () => {
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <a
-            href="#audit"
+            href="https://9000-firebase-studio-1770326908424.cluster-r7kbxfo3fnev2vskbkhhphetq6.cloudworkstations.dev"
+            target="_blank"
+            rel="noopener noreferrer"
             className="group px-8 py-4 bg-teal-500 hover:bg-teal-400 text-space-950 font-bold rounded-lg transition-all flex items-center justify-center gap-2"
           >
-            Solicitar Auditoría con IA
+            Ver Comunidad
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </a>
           <a
