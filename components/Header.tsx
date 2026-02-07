@@ -1,48 +1,227 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Rocket, Terminal, Activity, Trophy, ChevronRight, Lock, Zap } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isHoveringLaunch, setIsHoveringLaunch] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const appUrl = "https://9000-firebase-studio-1770326908424.cluster-r7kbxfo3fnev2vskbkhhphetq6.cloudworkstations.dev";
+
+  const navLinks: { name: string; href: string; icon: any; badge?: string; target?: string }[] = [
+    { name: 'Soluciones', href: '#tools', icon: null },
+    { name: 'Comunidad', href: appUrl, icon: Activity, badge: 'LIVE', target: '_blank' },
+    { name: 'Casos de Estudio', href: '#case-studies', icon: Trophy },
+  ];
+
   return (
-    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-space-950/90 backdrop-blur-md border-b border-space-800 py-3' : 'bg-transparent py-6'}`}>
-      <div className="container mx-auto px-6 flex justify-between items-center">
-        <div className="text-xl font-bold tracking-tighter text-white">
-          Apol<span className="text-teal-400">∞</span>rdonez
+    <motion.header 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      className={`fixed top-0 w-full z-50 transition-all duration-500 border-b border-white/5 ${
+        scrolled 
+          ? 'bg-space-950/80 backdrop-blur-xl py-2 shadow-2xl shadow-teal-900/10' 
+          : 'bg-transparent py-4'
+      }`}
+    >
+      {/* System Ticker - Desktop Only */}
+      <div className="hidden lg:flex justify-between px-6 mb-2 text-[10px] font-mono text-teal-500/40 tracking-widest uppercase">
+         <div className="flex gap-4">
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span> SYSTEM: ONLINE</span>
+            <span>v.2.4.0 STABLE</span>
+         </div>
+         <div className="flex gap-4">
+            <span>AI AGENTS: ACTIVE</span>
+            <span>MEMBERS: 1,242</span>
+         </div>
+      </div>
+
+      <div className="container mx-auto px-6 flex justify-between items-center relative">
+        
+        {/* 4D Hyper-Glow Identity */}
+        <div className="relative z-20 cursor-pointer">
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tighter flex items-center">
+                {/* Parte 1: Apol - Gradiente Blanco a Cristal */}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-teal-100 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                  Apol
+                </span>
+
+                {/* Parte 2: Infinity - Fluid Pulse Core */}
+                <motion.span 
+                  className="mx-0.5 text-teal-400 relative"
+                  animate={{
+                    textShadow: [
+                      "0 0 10px rgba(45, 212, 191, 0.4)", // Glow suave
+                      "0 0 25px rgba(45, 212, 191, 0.9)", // Glow intenso
+                      "0 0 10px rgba(45, 212, 191, 0.4)"  // Retorno
+                    ],
+                    scale: [1, 1.05, 1],
+                    filter: ["brightness(1)", "brightness(1.3)", "brightness(1)"]
+                  }}
+                  transition={{
+                    duration: 3, // Animación lenta y "respirable"
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  style={{
+                    // Sombra base para dar volumen 3D constante
+                    filter: "drop-shadow(0 2px 0px rgba(0,0,0,0.5))" 
+                  }}
+                >
+                  ∞
+                </motion.span>
+
+                {/* Parte 3: rdonez - Gradiente Teal Intenso */}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-teal-400 to-teal-500 drop-shadow-[0_0_15px_rgba(20,184,166,0.4)]">
+                  rdonez
+                </span>
+            </h1>
         </div>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex gap-8 items-center">
-          <a href="#tools" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Herramientas</a>
-          <a href="#roadmap" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Metodología</a>
-          <a href="#" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Casos de Éxito</a>
-          <a href="#audit" className="px-5 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white text-sm font-medium transition-all">
-            Agendar Diagnóstico
-          </a>
+        {/* Desktop Nav - The Bridge */}
+        <nav className="hidden md:flex gap-1 items-center bg-space-900/50 p-1 rounded-full border border-white/5 backdrop-blur-sm">
+          {navLinks.map((link) => (
+            <a 
+                key={link.name} 
+                href={link.href}
+                target={link.target}
+                rel={link.target ? "noopener noreferrer" : undefined}
+                className="relative px-5 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors group flex items-center gap-2 rounded-full hover:bg-white/5"
+            >
+                {link.icon && <link.icon className="w-3 h-3" />}
+                {link.name}
+                {link.badge && (
+                    <span className="absolute top-1 right-1 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                    </span>
+                )}
+            </a>
+          ))}
         </nav>
 
+        {/* Action Zone - The Launchpad */}
+        <div className="hidden md:flex items-center gap-4">
+            {/* Entry 1: Audit */}
+            <a 
+                href="#audit" 
+                className="text-xs font-mono text-slate-400 hover:text-teal-400 transition-colors border-b border-transparent hover:border-teal-500/50 pb-0.5"
+            >
+                Agendar Diagnóstico
+            </a>
+
+            {/* Entry 2: Launch Console (Primary) */}
+            <motion.a
+                href={appUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onHoverStart={() => setIsHoveringLaunch(true)}
+                onHoverEnd={() => setIsHoveringLaunch(false)}
+                className="relative group flex items-center gap-3 px-6 py-2.5 bg-teal-500 text-space-950 font-bold text-sm rounded-lg overflow-hidden transition-all hover:shadow-[0_0_20px_rgba(0,210,200,0.3)]"
+            >
+                <div className="relative z-10 flex items-center gap-2">
+                    <Terminal className="w-4 h-4" />
+                    <span>LAUNCH CONSOLE</span>
+                </div>
+                
+                {/* Shimmer Effect */}
+                <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent z-0"
+                    animate={{ x: ['-100%', '200%'] }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "linear", delay: 1 }}
+                />
+
+                {/* Hover Reveal Text */}
+                <AnimatePresence>
+                    {isHoveringLaunch && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute -bottom-8 left-0 right-0 text-center"
+                        >
+                            <span className="text-[10px] font-mono text-teal-400 bg-space-900/90 px-2 py-1 rounded border border-teal-500/30">
+                                Access Apolo OS
+                            </span>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.a>
+        </div>
+
         {/* Mobile Toggle */}
-        <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+        <button className="md:hidden text-white p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
       </div>
 
-      {/* Mobile Nav */}
-      {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-space-900 border-b border-space-800 p-6 flex flex-col gap-4">
-          <a href="#tools" className="text-slate-300" onClick={() => setMobileMenuOpen(false)}>Herramientas</a>
-          <a href="#roadmap" className="text-slate-300" onClick={() => setMobileMenuOpen(false)}>Metodología</a>
-          <a href="#audit" className="text-teal-400 font-bold" onClick={() => setMobileMenuOpen(false)}>Agendar Diagnóstico</a>
-        </div>
-      )}
-    </header>
+      {/* Animated Bottom Border */}
+      <div className="absolute bottom-0 left-0 w-full h-[1px] overflow-hidden">
+        <div className="w-full h-full bg-gradient-to-r from-transparent via-teal-500/50 to-transparent animate-[shimmer_3s_infinite_linear] opacity-50" />
+      </div>
+
+      {/* Mobile Nav Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-space-950 border-b border-space-800 overflow-hidden"
+          >
+            <div className="p-6 flex flex-col gap-6">
+                {navLinks.map((link) => (
+                    <a 
+                        key={link.name}
+                        href={link.href} 
+                        target={link.target}
+                        rel={link.target ? "noopener noreferrer" : undefined}
+                        className="flex items-center justify-between text-lg text-slate-300 font-medium border-b border-space-800 pb-4"
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <span className="flex items-center gap-3">
+                            {link.icon && <link.icon className="w-5 h-5 text-teal-500" />}
+                            {link.name}
+                        </span>
+                        {link.badge && <span className="text-xs bg-teal-500/20 text-teal-400 px-2 py-1 rounded animate-pulse">{link.badge}</span>}
+                    </a>
+                ))}
+                
+                <div className="grid gap-4 mt-2">
+                    <a 
+                        href="#audit" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-full py-4 rounded-lg border border-space-700 text-center text-slate-400 font-medium hover:bg-space-900 transition-colors"
+                    >
+                        Agendar Diagnóstico
+                    </a>
+                    <a 
+                        href={appUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-4 rounded-lg bg-teal-500 text-space-950 font-bold text-center flex items-center justify-center gap-2 shadow-lg shadow-teal-500/20"
+                    >
+                        <Zap className="w-5 h-5 fill-current" />
+                        LAUNCH CONSOLE
+                    </a>
+                </div>
+
+                <div className="text-[10px] font-mono text-center text-slate-600 mt-4">
+                    SYSTEM STATUS: ONLINE // SECURE CONNECTION
+                </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 };
 

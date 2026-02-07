@@ -12,16 +12,7 @@ const Hero: React.FC = () => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-teal-400/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-space-800 border border-teal-500/30 text-teal-400 text-sm font-mono mb-8"
-        >
-          <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-          SYSTEM: ONLINE // APOLO_ORDONEZ
-        </motion.div>
-
+        
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

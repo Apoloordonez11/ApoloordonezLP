@@ -1,7 +1,7 @@
 import React from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import TrackRecord from './components/TrackRecord';
+import CaseStudies from './components/CaseStudies';
 import ToolsSection from './components/ToolsSection';
 import TheMachine from './components/TheMachine';
 import Contact from './components/Contact';
@@ -13,7 +13,7 @@ const App: React.FC = () => {
       <Header />
       <main>
         <Hero />
-        <TrackRecord />
+        <CaseStudies />
         <ToolsSection />
         <TheMachine />
         <Contact />
