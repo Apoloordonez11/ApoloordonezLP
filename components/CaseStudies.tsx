@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, CreditCard, GraduationCap, Cpu, Bot, ArrowRight, ShieldCheck, Database, TrendingUp, Download, Zap, Lock } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { Activity, CreditCard, GraduationCap, Cpu, Bot, ShieldCheck, Download, ChevronRight, Lock, ArrowLeft } from 'lucide-react';
+
+interface CaseStudiesProps {
+  onBack: () => void;
+}
 
 const INDUSTRIES = [
   {
@@ -80,14 +84,76 @@ const INDUSTRIES = [
   }
 ];
 
-const CaseStudies: React.FC = () => {
+// --- 3D TILT CARD COMPONENT ---
+const TiltCard = ({ children, gradient }: { children?: React.ReactNode, gradient: string }) => {
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
+    const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
+
+    const rotateX = useTransform(mouseY, [-0.5, 0.5], ["15deg", "-15deg"]);
+    const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-15deg", "15deg"]);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+        x.set(xPct);
+        y.set(yPct);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    return (
+        <motion.div
+            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className="relative w-full h-full rounded-2xl transition-all duration-200 ease-linear"
+        >
+            {/* Main Card Background with Glassmorphism */}
+            <div 
+                className="absolute inset-0 bg-space-900/90 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden" 
+                style={{ transform: "translateZ(0px)" }}
+            >
+                 {/* Holo Foil Gradient that moves opposite to mouse */}
+                 <motion.div 
+                    className={`absolute -inset-full opacity-30 bg-gradient-to-tr from-transparent via-white to-transparent blur-3xl`}
+                    style={{
+                        x: useTransform(mouseX, [-0.5, 0.5], ["100%", "-100%"]),
+                        y: useTransform(mouseY, [-0.5, 0.5], ["100%", "-100%"]),
+                        background: `linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent)` 
+                    }}
+                 />
+                 {children}
+            </div>
+
+            {/* Floating Border (Parallax) */}
+            <div 
+                className={`absolute inset-0 rounded-2xl border-2 border-white/5 pointer-events-none bg-gradient-to-br ${gradient} opacity-20`}
+                style={{ transform: "translateZ(20px)" }}
+            />
+        </motion.div>
+    );
+};
+
+
+const CaseStudies: React.FC<CaseStudiesProps> = ({ onBack }) => {
   const [selectedId, setSelectedId] = useState('health');
   const selectedCase = INDUSTRIES.find(c => c.id === selectedId) || INDUSTRIES[0];
 
   return (
-    <section id="case-studies" className="py-24 bg-space-950 relative overflow-hidden min-h-screen flex flex-col justify-center">
+    <section className="py-24 bg-space-950 relative overflow-hidden min-h-screen flex flex-col">
       {/* Moving Background Grid */}
-      <div className="absolute inset-0 z-0 opacity-10">
+      <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
         <motion.div 
             className="w-full h-full bg-grid-pattern"
             animate={{ backgroundPosition: ["0px 0px", "0px 40px"] }}
@@ -95,7 +161,16 @@ const CaseStudies: React.FC = () => {
         />
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-10 pt-10">
+        {/* Botón VOLVER AL COMANDO */}
+        <button 
+            onClick={onBack}
+            className="mb-8 flex items-center gap-2 text-slate-400 hover:text-teal-400 transition-colors group font-mono text-sm"
+        >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            // BACK_TO_COMMAND_CENTER
+        </button>
+
         <div className="mb-12 text-center md:text-left">
              <div className="flex items-center gap-2 mb-2 justify-center md:justify-start">
                 <ShieldCheck className="w-5 h-5 text-teal-500" />
@@ -120,7 +195,7 @@ const CaseStudies: React.FC = () => {
                             className={`
                                 relative group flex-shrink-0 lg:w-full text-left p-4 rounded-xl border transition-all duration-300 overflow-hidden
                                 ${isActive 
-                                    ? `bg-space-900 ${ind.borderColor} border shadow-[0_0_15px_rgba(0,0,0,0.5)]` 
+                                    ? `bg-space-900 ${ind.borderColor} border shadow-[0_0_15px_rgba(0,0,0,0.5)] scale-[1.02]` 
                                     : 'bg-space-950/50 border-space-800 hover:border-space-700 hover:bg-space-900'}
                             `}
                         >
@@ -153,138 +228,109 @@ const CaseStudies: React.FC = () => {
                 })}
             </div>
 
-            {/* Holographic Main Display */}
-            <div className="lg:col-span-8 relative min-h-[500px]">
-                <div className="absolute inset-0 bg-space-900/80 backdrop-blur-md rounded-2xl border border-space-700/50 overflow-hidden shadow-2xl">
-                    
-                    {/* Top Bar Status */}
-                    <div className="flex justify-between items-center p-4 border-b border-space-700/50 bg-space-950/50">
-                        <div className="flex gap-2">
-                             <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500"></div>
-                             <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500"></div>
-                             <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500"></div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <span className="text-[10px] font-mono text-slate-500">ENCRYPTION: AES-256</span>
-                            <div className="flex items-center gap-2 px-3 py-1 bg-teal-500/10 border border-teal-500/30 rounded text-teal-400 text-[10px] font-mono">
-                                <Lock className="w-3 h-3" />
-                                <span>STATUS: VERIFIED</span>
-                            </div>
-                        </div>
-                    </div>
+            {/* Holographic Main Display (The 3D Tilt Card) */}
+            <div className="lg:col-span-8 relative min-h-[500px] perspective-1000">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={selectedCase.id}
+                        initial={{ opacity: 0, rotateX: 20, z: -100 }}
+                        animate={{ opacity: 1, rotateX: 0, z: 0 }}
+                        exit={{ opacity: 0, rotateX: -20, z: -100 }}
+                        transition={{ duration: 0.5 }}
+                        className="h-full"
+                    >
+                        <TiltCard gradient={selectedCase.gradient}>
+                            <div className="p-8 h-full flex flex-col relative z-20">
+                                 {/* Floating Grid Element */}
+                                 <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${selectedCase.gradient} opacity-10 blur-[80px] pointer-events-none`} />
 
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={selectedCase.id}
-                            initial={{ opacity: 0, filter: 'blur(10px)' }}
-                            animate={{ opacity: 1, filter: 'blur(0px)' }}
-                            exit={{ opacity: 0, filter: 'blur(10px)' }}
-                            transition={{ duration: 0.4 }}
-                            className="p-8 h-full flex flex-col relative"
-                        >
-                             {/* Floating Grid Element */}
-                             <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${selectedCase.gradient} opacity-5 blur-[100px] pointer-events-none`} />
-
-                             {/* Content Header */}
-                             <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8 relative z-10">
-                                <div>
-                                    <motion.h3 
-                                        className="text-3xl font-bold text-white mb-2"
-                                        initial={{ x: -20, opacity: 0 }}
-                                        animate={{ x: 0, opacity: 1 }}
-                                        transition={{ delay: 0.1 }}
-                                    >
-                                        {selectedCase.strategy}
-                                    </motion.h3>
-                                    <motion.p 
-                                        className="text-slate-400 max-w-lg leading-relaxed"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: 0.2 }}
-                                    >
-                                        {selectedCase.mechanic}
-                                    </motion.p>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-[10px] uppercase text-slate-500 font-mono mb-1">Impacto Auditado</div>
-                                    <motion.div 
-                                        className={`text-5xl font-black ${selectedCase.color}`}
-                                        initial={{ scale: 0.5, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
-                                    >
-                                        {selectedCase.stat}
-                                    </motion.div>
-                                    <div className="text-sm font-bold text-slate-400">{selectedCase.statLabel}</div>
-                                </div>
-                             </div>
-
-                             {/* Interactive Visual Area */}
-                             <div className="flex-grow bg-space-950/50 rounded-xl border border-space-800 p-6 mb-8 relative overflow-hidden group">
-                                 <div className="absolute inset-0 bg-grid-pattern opacity-20" />
-                                 
-                                 <div className="relative z-10 h-full flex items-end gap-2 pb-4">
-                                     {/* Simple Animated Graph Simulation based on type */}
-                                     {['h-1/3', 'h-1/2', 'h-2/3', 'h-3/4', 'h-full'].map((h, i) => (
-                                         <motion.div
-                                            key={i}
-                                            initial={{ height: '0%' }}
-                                            animate={{ height: selectedCase.visual === 'bar-inverted' ? ['100%', '40%'] : ['0%', i === 4 ? '90%' : `${(i+1)*15}%`] }}
-                                            transition={{ duration: 1, delay: i * 0.1 }}
-                                            className={`flex-1 rounded-t-sm opacity-50 ${selectedCase.color.replace('text-', 'bg-')}`}
-                                         />
-                                     ))}
-                                 </div>
-                                 
-                                 {/* Overlay Data Points */}
-                                 <div className="absolute top-4 left-4 font-mono text-xs text-slate-500">
-                                     <div>DATA_POINTS: 1,402</div>
-                                     <div>OPTIMIZATION: ACTIVE</div>
-                                 </div>
-                             </div>
-
-                             {/* Bottom Tech Stack & CTA */}
-                             <div className="mt-auto flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-space-800">
-                                 <div className="flex items-center gap-4">
-                                     <span className="text-xs font-bold text-slate-500 uppercase">Tech Stack:</span>
+                                 {/* Top Bar Status */}
+                                 <div className="flex justify-between items-center pb-4 border-b border-white/5 mb-6">
                                      <div className="flex gap-2">
-                                         {selectedCase.stack.map(tech => (
-                                             <span key={tech} className="px-2 py-1 bg-space-800 rounded text-xs text-slate-300 border border-space-700">
-                                                 {tech}
-                                             </span>
+                                          <div className="w-2 h-2 rounded-full bg-slate-500/20 border border-slate-500"></div>
+                                          <div className="w-2 h-2 rounded-full bg-slate-500/20 border border-slate-500"></div>
+                                     </div>
+                                     <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full text-[10px] font-mono text-slate-400">
+                                         <Lock className="w-3 h-3" />
+                                         <span>DATA ENCRYPTED</span>
+                                     </div>
+                                 </div>
+
+                                 {/* Content Header */}
+                                 <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8 relative z-10" style={{ transform: "translateZ(30px)" }}>
+                                    <div>
+                                        <h3 className="text-3xl font-bold text-white mb-2 shadow-black drop-shadow-lg">
+                                            {selectedCase.strategy}
+                                        </h3>
+                                        <p className="text-slate-400 max-w-lg leading-relaxed">
+                                            {selectedCase.mechanic}
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-[10px] uppercase text-slate-500 font-mono mb-1">Impacto Auditado</div>
+                                        <div className={`text-5xl font-black ${selectedCase.color} drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]`}>
+                                            {selectedCase.stat}
+                                        </div>
+                                        <div className="text-sm font-bold text-slate-400">{selectedCase.statLabel}</div>
+                                    </div>
+                                 </div>
+
+                                 {/* Interactive Visual Area */}
+                                 <div 
+                                    className="flex-grow bg-black/20 rounded-xl border border-white/5 p-6 mb-8 relative overflow-hidden group shadow-inner"
+                                    style={{ transform: "translateZ(10px)" }}
+                                 >
+                                     <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+                                     
+                                     <div className="relative z-10 h-full flex items-end gap-2 pb-4">
+                                         {['h-1/3', 'h-1/2', 'h-2/3', 'h-3/4', 'h-full'].map((h, i) => (
+                                             <motion.div
+                                                key={i}
+                                                initial={{ height: '0%' }}
+                                                animate={{ height: selectedCase.visual === 'bar-inverted' ? ['100%', '40%'] : ['0%', i === 4 ? '90%' : `${(i+1)*15}%`] }}
+                                                transition={{ duration: 1, delay: i * 0.1 }}
+                                                className={`flex-1 rounded-t-sm opacity-60 ${selectedCase.color.replace('text-', 'bg-')}`}
+                                             />
                                          ))}
                                      </div>
                                  </div>
 
-                                 <a 
-                                    href="#audit"
-                                    className={`
-                                        group flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm transition-all
-                                        bg-space-800 text-white hover:bg-space-700 border border-space-700 hover:border-teal-500/50
-                                    `}
+                                 {/* Bottom Tech Stack & CTA */}
+                                 <div 
+                                    className="mt-auto flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-white/5"
+                                    style={{ transform: "translateZ(20px)" }}
                                  >
-                                     <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-                                     Descargar Protocolo
-                                 </a>
-                             </div>
+                                     <div className="flex items-center gap-4">
+                                         <span className="text-xs font-bold text-slate-500 uppercase">Tech Stack:</span>
+                                         <div className="flex gap-2">
+                                             {selectedCase.stack.map(tech => (
+                                                 <span key={tech} className="px-2 py-1 bg-white/5 rounded text-xs text-slate-300 border border-white/10">
+                                                     {tech}
+                                                 </span>
+                                             ))}
+                                         </div>
+                                     </div>
 
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-                
-                {/* Decorative Elements */}
-                <div className="absolute -bottom-2 -right-2 w-20 h-20 bg-space-800 -z-10 rounded-br-3xl" />
-                <div className="absolute -top-2 -left-2 w-20 h-20 bg-space-800 -z-10 rounded-tl-3xl" />
+                                     <button 
+                                        onClick={() => navigator.clipboard.writeText("Protocol Details Copied")}
+                                        className={`
+                                            group flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm transition-all
+                                            bg-white/10 text-white hover:bg-white/20 border border-white/10 hover:border-teal-500/50
+                                        `}
+                                     >
+                                         <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                                         Descargar Protocolo
+                                     </button>
+                                 </div>
+                            </div>
+                        </TiltCard>
+                    </motion.div>
+                </AnimatePresence>
             </div>
         </div>
       </div>
     </section>
   );
 };
-
-// Helper component for arrow
-const ChevronRight = ({ className }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>
-);
 
 export default CaseStudies;
