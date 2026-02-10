@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, ChevronDown, Zap, Play } from 'lucide-react';
 
 interface HeroProps {
-  onNavigate: (view: 'home' | 'cases' | 'calculator') => void;
+  onNavigate: (view: 'home' | 'cases' | 'calculator' | 'legal') => void;
 }
 
 // Magnetic Button Component

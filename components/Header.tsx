@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Rocket, Terminal, Activity, Trophy, ChevronRight, Lock, Zap, LayoutGrid } from 'lucide-react';
 
 interface HeaderProps {
-  onNavigate: (view: 'home' | 'cases' | 'calculator') => void;
-  currentView: 'home' | 'cases' | 'calculator';
+  onNavigate: (view: 'home' | 'cases' | 'calculator' | 'legal') => void;
+  currentView: 'home' | 'cases' | 'calculator' | 'legal';
 }
 
 const Header: React.FC<HeaderProps> = ({ onNavigate, currentView }) => {

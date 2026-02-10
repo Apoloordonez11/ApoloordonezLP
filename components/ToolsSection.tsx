@@ -5,7 +5,7 @@ import { INDUSTRIES } from '../constants';
 import { IndustryRoadmap } from '../types';
 
 interface ToolsSectionProps {
-  onNavigate: (view: 'home' | 'cases' | 'calculator') => void;
+  onNavigate: (view: 'home' | 'cases' | 'calculator' | 'legal') => void;
 }
 
 const ToolsSection: React.FC<ToolsSectionProps> = ({ onNavigate }) => {

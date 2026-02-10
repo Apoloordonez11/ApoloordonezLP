@@ -9,9 +9,10 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import GrowthSimulator from './components/GrowthSimulator';
 import LivePulse from './components/LivePulse';
+import LegalHub from './components/LegalHub';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'cases' | 'calculator'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'cases' | 'calculator' | 'legal'>('home');
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Scroll Progress
@@ -31,7 +32,7 @@ const App: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const navigateTo = (view: 'home' | 'cases' | 'calculator') => {
+  const navigateTo = (view: 'home' | 'cases' | 'calculator' | 'legal') => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setCurrentView(view);
   };
@@ -60,7 +61,7 @@ const App: React.FC = () => {
       />
 
       {/* --- LIVE PULSE (FOMO) --- */}
-      <LivePulse />
+      {currentView !== 'legal' && <LivePulse />}
 
       <Header onNavigate={navigateTo} currentView={currentView} />
       
@@ -68,19 +69,20 @@ const App: React.FC = () => {
         {currentView === 'home' ? (
           <>
             <Hero onNavigate={navigateTo} />
-            {/* UPDATED: Passing navigation prop to ToolsSection */}
             <ToolsSection onNavigate={navigateTo} />
             <TheMachine />
             <Contact />
           </>
         ) : currentView === 'cases' ? (
           <CaseStudies onBack={() => navigateTo('home')} />
-        ) : (
+        ) : currentView === 'calculator' ? (
           <GrowthSimulator onBack={() => navigateTo('home')} />
+        ) : (
+          <LegalHub onBack={() => navigateTo('home')} />
         )}
       </main>
       
-      <Footer />
+      <Footer onNavigate={navigateTo} />
     </div>
   );
 };
