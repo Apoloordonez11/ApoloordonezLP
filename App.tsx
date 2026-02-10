@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import CaseStudies from './components/CaseStudies';
@@ -83,6 +84,8 @@ const App: React.FC = () => {
       </main>
       
       <Footer onNavigate={navigateTo} />
+
+      <SpeedInsights />
     </div>
   );
 };
