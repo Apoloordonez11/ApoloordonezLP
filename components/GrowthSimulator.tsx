@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useSpring, useTransform, animate, useMotionValue } from 'framer-motion';
-import { X, ArrowRight, Zap, Bot, BrainCircuit, TrendingUp, Lock, Activity, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'framer-motion';
+import { X, ArrowRight, Zap, Bot, BrainCircuit, Activity, Sparkles } from 'lucide-react';
 
 // --- TIPOS ---
 type ProtocolType = 'A' | 'B' | 'C';
@@ -76,10 +76,10 @@ const PlasmaSlider = ({ label, value, min, max, onChange, protocol }: any) => {
     const percentage = ((value - min) / (max - min)) * 100;
     
     return (
-      <div className="mb-10 group">
+      <div className="mb-8 md:mb-10 group">
         <div className="flex justify-between items-end mb-4">
-          <label className="text-xs font-mono text-slate-400 uppercase tracking-[0.2em]">{label}</label>
-          <div className="font-mono text-xl text-white font-bold tracking-widest bg-black/30 px-3 py-1 rounded border border-white/10">
+          <label className="text-[10px] md:text-xs font-mono text-slate-400 uppercase tracking-[0.2em]">{label}</label>
+          <div className="font-mono text-lg md:text-xl text-white font-bold tracking-widest bg-black/30 px-3 py-1 rounded border border-white/10">
             ${value.toLocaleString()}
           </div>
         </div>
@@ -142,10 +142,9 @@ const GrowthSimulator: React.FC<GrowthSimulatorProps> = ({ onBack }) => {
 
   const handleAction = () => {
     setIsProcessing(true);
-    // Simular carga y redirección
+    // Simular carga
     setTimeout(() => {
         setIsProcessing(false);
-        // Aquí iría la redirección real
         alert("PROTOCOL INITIATED. WELCOME TO APOLO OS.");
     }, 2000);
   };
@@ -155,55 +154,56 @@ const GrowthSimulator: React.FC<GrowthSimulatorProps> = ({ onBack }) => {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 bg-[#050506] flex flex-col md:flex-row overflow-hidden"
     >
-        {/* FONDO AMBIENTAL 4D */}
+        {/* FONDO AMBIENTAL 4D (Global) */}
         <motion.div 
-            className="absolute inset-0 opacity-20 pointer-events-none transition-colors duration-700"
+            className="absolute inset-0 opacity-20 pointer-events-none transition-colors duration-700 z-0"
             style={{ background: `radial-gradient(circle at 70% 30%, ${activeP.baseColor}, transparent 60%)` }}
         />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>
 
-        {/* --- PANEL IZQUIERDO: CONTROLES --- */}
-        <div className="relative w-full md:w-[450px] bg-space-950/80 backdrop-blur-2xl border-r border-white/5 flex flex-col h-full z-20">
+        {/* --- PANEL IZQUIERDO: CONTROLES (Scrollable en Móvil) --- */}
+        <div className="relative w-full md:w-[450px] bg-space-950/80 backdrop-blur-2xl md:border-r border-white/5 flex flex-col h-full z-10">
             {/* Header */}
-            <div className="p-8 border-b border-white/5">
+            <div className="shrink-0 p-6 md:p-8 border-b border-white/5 bg-space-950/90 md:bg-transparent">
                 <button onClick={onBack} className="mb-6 flex items-center gap-2 text-xs text-slate-500 hover:text-white transition-colors uppercase tracking-widest font-mono group">
                     <div className="p-1 border border-slate-700 rounded-full group-hover:border-white group-hover:bg-white/10"><X className="w-3 h-3" /></div>
                     Abortar Simulación
                 </button>
-                <h2 className="text-3xl font-black text-white mb-1 tracking-tight">GROWTH<br/><span className={`text-transparent bg-clip-text bg-gradient-to-r ${activeP.gradient}`}>REACTOR_v4</span></h2>
+                <h2 className="text-2xl md:text-3xl font-black text-white mb-1 tracking-tight">GROWTH<br/><span className={`text-transparent bg-clip-text bg-gradient-to-r ${activeP.gradient}`}>REACTOR_v4</span></h2>
             </div>
 
             {/* Inputs Scrollable */}
-            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+            {/* NOTE: pb-48 in mobile ensures the last elements aren't hidden behind the fixed HUD */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 pb-48 md:pb-8 custom-scrollbar">
                 <PlasmaSlider label="Ingreso Mensual Actual" value={revenue} min={1000} max={100000} onChange={setRevenue} protocol={activeP} />
                 <PlasmaSlider label="Inversión Ads (Mes)" value={adSpend} min={500} max={50000} onChange={setAdSpend} protocol={activeP} />
 
-                <div className="mt-12">
-                    <label className="text-xs font-mono text-slate-500 uppercase tracking-[0.2em] mb-6 block">Protocolo de Reacción</label>
-                    <div className="grid gap-4">
+                <div className="mt-8 md:mt-12">
+                    <label className="text-xs font-mono text-slate-500 uppercase tracking-[0.2em] mb-4 md:mb-6 block">Protocolo de Reacción</label>
+                    <div className="grid gap-3 md:gap-4">
                         {PROTOCOLS.map((p) => {
                             const isActive = selectedId === p.id;
                             return (
                                 <button
                                     key={p.id}
                                     onClick={() => setSelectedId(p.id)}
-                                    className={`relative p-4 rounded-xl text-left border transition-all duration-300 overflow-hidden group
+                                    className={`relative p-3 md:p-4 rounded-xl text-left border transition-all duration-300 overflow-hidden group
                                         ${isActive ? `border-transparent bg-space-900 shadow-[0_0_30px_-10px_${p.baseColor}]` : 'border-white/5 hover:border-white/10 bg-transparent'}
                                     `}
                                 >
                                     {isActive && (
                                         <div className={`absolute inset-0 bg-gradient-to-r ${p.gradient} opacity-10`} />
                                     )}
-                                    <div className="flex items-center gap-4 relative z-10">
+                                    <div className="flex items-center gap-3 md:gap-4 relative z-10">
                                         <div className={`p-2 rounded-lg ${isActive ? `bg-gradient-to-br ${p.gradient} text-black shadow-lg` : 'bg-space-900 text-slate-500'}`}>
-                                            <p.icon className="w-5 h-5" />
+                                            <p.icon className="w-4 h-4 md:w-5 md:h-5" />
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <h4 className={`font-bold text-sm ${isActive ? 'text-white' : 'text-slate-400'}`}>{p.name}</h4>
-                                                {isActive && <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-white font-mono">{p.tagline}</span>}
+                                                <h4 className={`font-bold text-xs md:text-sm ${isActive ? 'text-white' : 'text-slate-400'}`}>{p.name}</h4>
+                                                {isActive && <span className="hidden md:inline-block text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-white font-mono">{p.tagline}</span>}
                                             </div>
-                                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{p.description}</p>
+                                            <p className="text-[10px] md:text-xs text-slate-500 mt-1 line-clamp-2">{p.description}</p>
                                         </div>
                                     </div>
                                     {isActive && <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${p.gradient}`} />}
@@ -215,11 +215,17 @@ const GrowthSimulator: React.FC<GrowthSimulatorProps> = ({ onBack }) => {
             </div>
         </div>
 
-        {/* --- PANEL DERECHO: VISUALIZACIÓN HOLOGRÁFICA --- */}
-        <div className="relative flex-1 flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden">
+        {/* --- PANEL DERECHO (DESKTOP) / HUD TÁCTICO (MOBILE) --- */}
+        <div className={`
+            fixed bottom-0 left-0 right-0 z-50 
+            md:relative md:inset-auto md:z-10 md:flex-1 md:flex md:flex-col md:items-center md:justify-center 
+            border-t border-white/10 md:border-none
+            bg-space-950/80 backdrop-blur-xl md:bg-transparent md:backdrop-filter-none
+            shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.8)] md:shadow-none
+        `}>
             
-            {/* Círculo Holográfico de Fondo */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            {/* Círculo Holográfico de Fondo (Solo visible en Desktop para no ensuciar el HUD móvil) */}
+            <div className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
                 <motion.div 
                     className={`w-[500px] h-[500px] rounded-full border border-white/5 opacity-20`}
                     animate={{ rotate: 360, scale: [1, 1.1, 1] }}
@@ -234,33 +240,52 @@ const GrowthSimulator: React.FC<GrowthSimulatorProps> = ({ onBack }) => {
                 />
             </div>
 
-            {/* Tarjeta de Resultado Principal */}
-            <div className="relative z-10 w-full max-w-2xl">
+            {/* Tarjeta de Resultado Principal / Contenido del HUD */}
+            <div className="w-full max-w-2xl px-4 py-4 md:p-0 md:relative md:z-10">
                 <motion.div 
                     layoutId="result-card"
-                    className="bg-space-950/50 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 text-center shadow-2xl relative overflow-hidden"
+                    className="
+                        flex flex-row items-center justify-between gap-4 
+                        md:flex-col md:bg-space-950/50 md:backdrop-blur-xl md:border md:border-white/10 md:rounded-3xl md:p-12 md:text-center md:shadow-2xl md:relative md:overflow-hidden
+                    "
                 >
-                    {/* Brillo Superior */}
-                    <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${activeP.gradient}`} />
-                    <div className={`absolute -top-20 -left-20 w-64 h-64 bg-${activeP.baseColor} blur-[100px] opacity-20 pointer-events-none`} />
+                    {/* Brillo Superior (Desktop Only) */}
+                    <div className={`hidden md:block absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${activeP.gradient}`} />
+                    <div className={`hidden md:block absolute -top-20 -left-20 w-64 h-64 bg-${activeP.baseColor} blur-[100px] opacity-20 pointer-events-none`} />
 
-                    <h3 className="text-sm font-mono text-slate-400 uppercase tracking-[0.3em] mb-4 flex items-center justify-center gap-2">
+                    {/* Desktop Label */}
+                    <h3 className="hidden md:flex text-sm font-mono text-slate-400 uppercase tracking-[0.3em] mb-4 items-center justify-center gap-2">
                         <Activity className="w-4 h-4 animate-pulse" />
                         Proyección Anual Ecosistema
                     </h3>
 
-                    {/* JACKPOT NUMBER */}
-                    <div className="relative mb-8">
-                        <div className={`text-6xl md:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br ${activeP.gradient} drop-shadow-2xl`}>
-                            $<JackpotCounter value={projectedAnnual} color={activeP.baseColor} />
+                    {/* JACKPOT NUMBER & GROWTH */}
+                    <div className="flex flex-col md:block">
+                        <div className="flex items-baseline gap-2 md:block">
+                             <div className={`
+                                text-3xl min-[380px]:text-4xl md:text-8xl 
+                                font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br ${activeP.gradient} 
+                                drop-shadow-2xl tabular-nums
+                             `}>
+                                $<JackpotCounter value={projectedAnnual} color={activeP.baseColor} />
+                            </div>
+                            {/* Mobile Growth Badge (Compact) */}
+                            <span className="md:hidden text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                +{growth.toFixed(0)}%
+                            </span>
                         </div>
-                        <div className="text-sm md:text-lg text-emerald-400 font-mono mt-2 bg-emerald-500/10 inline-block px-4 py-1 rounded-full border border-emerald-500/20">
+                        
+                        {/* Desktop Growth Badge (Full) */}
+                        <div className="hidden md:inline-block text-lg text-emerald-400 font-mono mt-2 bg-emerald-500/10 px-4 py-1 rounded-full border border-emerald-500/20">
                             ▲ +{growth.toFixed(0)}% Crecimiento Explosivo
+                        </div>
+                        <div className="md:hidden text-[10px] text-slate-500 font-mono mt-0.5">
+                             Proyección Anual
                         </div>
                     </div>
 
-                    {/* Gráfico Minimalista de Comparación */}
-                    <div className="h-16 w-full max-w-md mx-auto bg-space-900 rounded-lg overflow-hidden relative mb-8 flex items-end">
+                    {/* Gráfico Minimalista (Hidden on Mobile) */}
+                    <div className="hidden md:flex h-16 w-full max-w-md mx-auto bg-space-900 rounded-lg overflow-hidden relative mb-8 items-end">
                         <div className="w-1/2 h-full absolute left-0 bottom-0 bg-slate-800/30 border-r border-white/10 flex items-center justify-center text-xs text-slate-500 font-mono">ACTUAL</div>
                         <div className="w-full h-full absolute left-0 bottom-0 flex items-end">
                              <motion.div 
@@ -280,27 +305,34 @@ const GrowthSimulator: React.FC<GrowthSimulatorProps> = ({ onBack }) => {
                         </div>
                     </div>
 
-                    {/* BOTÓN 4D */}
+                    {/* BOTÓN DE ACCIÓN (Adapta tamaño en móvil) */}
                     <motion.button
                         onClick={handleAction}
                         whileHover={{ scale: 1.02, boxShadow: `0 0 40px ${activeP.baseColor}40` }}
                         whileTap={{ scale: 0.98 }}
                         disabled={isProcessing}
                         className={`
-                            relative w-full py-5 rounded-xl font-black text-lg tracking-[0.2em] uppercase text-white overflow-hidden transition-all
+                            relative w-auto md:w-full px-6 py-3 md:py-5 rounded-lg md:rounded-xl 
+                            font-black text-xs md:text-lg tracking-[0.1em] md:tracking-[0.2em] uppercase text-white overflow-hidden transition-all
                             bg-gradient-to-r ${activeP.gradient} ${activeP.shadow}
+                            flex-shrink-0
                         `}
                     >
-                        <span className="relative z-10 flex items-center justify-center gap-3">
-                            {isProcessing ? <Activity className="animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                            {isProcessing ? 'INICIALIZANDO...' : activeP.cta}
+                        <span className="relative z-10 flex items-center justify-center gap-2 md:gap-3">
+                            {isProcessing ? <Activity className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 md:w-5 md:h-5" />}
+                            {isProcessing ? '...' : (
+                                <>
+                                    <span className="md:hidden">INICIAR</span>
+                                    <span className="hidden md:inline">{activeP.cta}</span>
+                                </>
+                            )}
                         </span>
                         
                         {/* Shimmer Effect */}
                         <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent z-0" />
                     </motion.button>
 
-                    <p className="text-xs text-slate-500 mt-6 max-w-xs mx-auto">
+                    <p className="hidden md:block text-xs text-slate-500 mt-6 max-w-xs mx-auto">
                         *Estimación basada en data histórica de clientes Apolo con configuraciones similares.
                     </p>
                 </motion.div>
